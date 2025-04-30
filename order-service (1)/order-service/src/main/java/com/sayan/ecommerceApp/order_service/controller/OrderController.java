@@ -19,6 +19,10 @@ import java.util.List;
 @Slf4j
 public class OrderController {
     private final OrderService orderService;
+    @GetMapping("/getOrders")
+    public String getOrders(){
+        return "From order service";
+    }
 
     @GetMapping
     public ResponseEntity<List<OrderRequestDto>> getAllOrders(HttpServletRequest httpServletRequest){
