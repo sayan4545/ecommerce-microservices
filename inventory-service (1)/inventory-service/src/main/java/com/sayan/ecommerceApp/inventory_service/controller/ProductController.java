@@ -32,7 +32,7 @@ public class ProductController {
         ServiceInstance service = discoveryClient.getInstances("order-service")
                 .getFirst();
         return restClient.get()
-                .uri(service.getUri()+"/api/v1/orders/getOrders")
+                .uri(service.getUri()+"/orders/core/getOrders")
                 .retrieve()
                 .body(String.class);
     }
