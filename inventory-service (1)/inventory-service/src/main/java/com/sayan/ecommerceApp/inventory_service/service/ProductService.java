@@ -1,8 +1,11 @@
 package com.sayan.ecommerceApp.inventory_service.service;
 
+import com.sayan.ecommerceApp.inventory_service.dto.OrderRequestDto;
+import com.sayan.ecommerceApp.inventory_service.dto.OrderRequestItemDto;
 import com.sayan.ecommerceApp.inventory_service.dto.ProductDto;
 import com.sayan.ecommerceApp.inventory_service.entities.Product;
 import com.sayan.ecommerceApp.inventory_service.repositories.ProductRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -33,8 +36,24 @@ public class ProductService {
         Optional<Product> inventory = productRepository.findById(id);
         return inventory.map(item ->modelmapper.map(item,ProductDto.class))
                 .orElseThrow(()-> new RuntimeException("Inventory not found"));
-
     }
 
-
+    @Transactional
+    public Double reduceStocks(OrderRequestDto orderRequestDto) {
+        log.info("Reducing stocks..");
+        Double totalPrice = 0.0;
+        for(OrderRequestItemDto orderRequestItemDto : orderRequestDto.getItems()){
+            Long productId = orderRequestItemDto.getProductId();
+            Integer quantity = orderRequestItemDto.getQuantity();
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(()-> new RuntimeException("Product not fopund"));
+            if(product.getStock()< quantity){
+                throw new RuntimeException("Exceeds quantity");
+            }
+            productRepository.save(product);
+            product.setStock(product.getStock()-quantity);
+            totalPrice = totalPrice + quantity*product.getPrice();
+        }
+        return totalPrice;
+    }
 }

@@ -1,6 +1,9 @@
 package com.sayan.ecommerceApp.inventory_service.controller;
 
 
+import com.sayan.ecommerceApp.inventory_service.clients.OrdersFeignClient;
+import com.sayan.ecommerceApp.inventory_service.dto.OrderRequestDto;
+import com.sayan.ecommerceApp.inventory_service.dto.OrderRequestItemDto;
 import com.sayan.ecommerceApp.inventory_service.dto.ProductDto;
 import com.sayan.ecommerceApp.inventory_service.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -9,10 +12,7 @@ import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchPropert
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
@@ -26,15 +26,22 @@ public class ProductController {
     private final ProductService productService;
     private final DiscoveryClient discoveryClient;
     private final RestClient restClient;
+    private final OrdersFeignClient ordersFeignClient;
 
     @GetMapping("/fetchOrder")
     public String fetchOrder(){
-        ServiceInstance service = discoveryClient.getInstances("order-service")
-                .getFirst();
-        return restClient.get()
-                .uri(service.getUri()+"/orders/core/getOrders")
-                .retrieve()
-                .body(String.class);
+//        ServiceInstance service = discoveryClient.getInstances("order-service")
+//                .getFirst();
+//        return restClient.get()
+//                .uri(service.getUri()+"/orders/core/getOrders")
+//                .retrieve()
+//                .body(String.class);
+        return ordersFeignClient.helloOrders();
+    }
+    @PutMapping("/reduce-stocks")
+    public ResponseEntity<Double> reduceStocks(@RequestBody OrderRequestDto orderRequestDto){
+        Double totalPrice = productService.reduceStocks(orderRequestDto);
+        return ResponseEntity.ok(totalPrice);
     }
 
     @GetMapping
