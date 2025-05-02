@@ -4,3 +4,12 @@ resilience4j:
       inventoryRetry:
         max-attempts: 3
         wait-duration: 5s
+
+  ratelimiter:
+    instances:
+      inventoryrateLimiter:
+        limit-for-period: 5
+        limit-refresh-period: 2
+        timeout-duration:
+          2s
+

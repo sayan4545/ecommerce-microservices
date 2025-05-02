@@ -2,6 +2,7 @@ package com.sayan.ecommerceApp.order_service.controller;
 import com.sayan.ecommerceApp.order_service.clients.InventoryFeignClient;
 import com.sayan.ecommerceApp.order_service.dtos.OrderRequestDto;
 import com.sayan.ecommerceApp.order_service.service.OrderService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class OrderController {
     }
     @PostMapping("/createOrder")
     @Retry(name = "inventoryRetry",fallbackMethod = "createOrderFallBack")
+    @RateLimiter(name = "inventoryRateLimiter",fallbackMethod = "createOrderfallBack")
 
     public ResponseEntity<OrderRequestDto> createOrder(@RequestBody OrderRequestDto orderRequestDto){
         OrderRequestDto orderRequestDto1 = orderService.createOrder(orderRequestDto);
