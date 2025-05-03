@@ -2,6 +2,7 @@ package com.sayan.ecommerceApp.order_service.controller;
 import com.sayan.ecommerceApp.order_service.clients.InventoryFeignClient;
 import com.sayan.ecommerceApp.order_service.dtos.OrderRequestDto;
 import com.sayan.ecommerceApp.order_service.service.OrderService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,8 +26,9 @@ public class OrderController {
         return "From order service";
     }
     @PostMapping("/createOrder")
-    @Retry(name = "inventoryRetry",fallbackMethod = "createOrderFallBack")
-    @RateLimiter(name = "inventoryRateLimiter",fallbackMethod = "createOrderfallBack")
+    //@Retry(name = "inventoryRetry",fallbackMethod = "createOrderFallBack")
+    //@RateLimiter(name = "inventoryRateLimiter",fallbackMethod = "createOrderfallBack")
+    @CircuitBreaker(name = "inventoryCircuitBreaker",fallbackMethod = "createOrderFallBack")
 
     public ResponseEntity<OrderRequestDto> createOrder(@RequestBody OrderRequestDto orderRequestDto){
         OrderRequestDto orderRequestDto1 = orderService.createOrder(orderRequestDto);
